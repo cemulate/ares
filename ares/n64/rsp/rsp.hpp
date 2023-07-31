@@ -480,6 +480,9 @@ struct RSP : Thread, Memory::RCP<RSP> {
   //emux.cpp
   auto TNE(cr32& rt, cr32& rs, u32 code) -> void;
   auto EMUX(cr32& rt, u32 code) -> void;
+  struct {
+    u32 buflen;
+  } emux;
 
 //unserialized:
   u16 reciprocals[512];
