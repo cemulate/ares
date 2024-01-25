@@ -129,6 +129,7 @@ auto RSP::Recompiler::emit(u12 address) -> Block* {
 #define Vdn (instruction >>  6 & 31)
 #define Vsn (instruction >> 11 & 31)
 #define Vtn (instruction >> 16 & 31)
+#define Code (instruction >> 6 & 1023)
 #define Rd  sreg(1), offsetof(IPU, r) + Rdn * sizeof(r32)
 #define Rt  sreg(1), offsetof(IPU, r) + Rtn * sizeof(r32)
 #define Rs  sreg(1), offsetof(IPU, r) + Rsn * sizeof(r32)
@@ -547,9 +548,24 @@ auto RSP::Recompiler::emitSPECIAL(u32 instruction) -> bool {
   }
 
   //INVALID
-  case range20(0x2c, 0x3f): {
+  case range10(0x2c, 0x35): {
     return 0;
   }
+
+  //TNE Rs,Rt,Code
+  case 0x36: {
+    lea(reg(1), Rs);
+    lea(reg(2), Rt);
+    mov32(reg(3), imm(Code));
+    call(&RSP::TNE);
+    return 0;
+  }
+
+  //INVALID
+  case range9(0x37, 0x3f): {
+    return 0;
+  }
+  
 
   }
 
@@ -1480,6 +1496,7 @@ auto RSP::Recompiler::isTerminal(u32 instruction) -> bool {
 #undef Vdn
 #undef Vsn
 #undef Vtn
+#undef Code
 #undef Rd
 #undef Rt
 #undef Rs
